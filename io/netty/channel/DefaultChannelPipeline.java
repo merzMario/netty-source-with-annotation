@@ -88,7 +88,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
      * change.
      */
     private boolean registered;
-
+    //pipeline中包含tailContext和headContext
     protected DefaultChannelPipeline(Channel channel) {
         this.channel = ObjectUtil.checkNotNull(channel, "channel");
         succeededFuture = new SucceededChannelFuture(channel, null);

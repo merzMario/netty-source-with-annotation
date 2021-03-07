@@ -131,11 +131,11 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     void init(Channel channel) {
         setChannelOptions(channel, newOptionsArray(), logger);
         setAttributes(channel, attrs0().entrySet().toArray(EMPTY_ATTRIBUTE_ARRAY));
-
+        //在AbstractBootstrap#initAndRegister方法中,创建NioServerSocketChannel时创建pipeline
         ChannelPipeline p = channel.pipeline();
 
         final EventLoopGroup currentChildGroup = childGroup;
-        final ChannelHandler currentChildHandler = childHandler;
+        final ChannelHandler currentChildHandler = childHandler; //#childHandler传入的匿名ChannelInitializer
         final Entry<ChannelOption<?>, Object>[] currentChildOptions;
         synchronized (childOptions) {
             currentChildOptions = childOptions.entrySet().toArray(EMPTY_OPTION_ARRAY);
@@ -146,7 +146,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             @Override
             public void initChannel(final Channel ch) {
                 final ChannelPipeline pipeline = ch.pipeline();
-                ChannelHandler handler = config.handler();
+                ChannelHandler handler = config.handler(); //服务端一般不设置handler
                 if (handler != null) {
                     pipeline.addLast(handler);
                 }
@@ -154,9 +154,9 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() { //将ServerBootstrapAcceptor添加到pipeline,当有连接时，会触发其channelRead方法
-                        pipeline.addLast(new ServerBootstrapAcceptor(
+                        pipeline.addLast(new ServerBootstrapAcceptor( //currentChildHandler是ChannelInitializer,通过它来添加其他业务handler
                                 ch, currentChildGroup, currentChildHandler, currentChildOptions, currentChildAttrs));
-                    }
+                    }           //ServerBootstrapAcceptor 是一个ChannelInboundHandler
                 });
             }
         });
@@ -208,13 +208,13 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         @SuppressWarnings("unchecked")
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
             final Channel child = (Channel) msg;
-
+            //当有连接时，会触发channelRead方法，将业务handler添加到pipeline中
             child.pipeline().addLast(childHandler);
 
             setChannelOptions(child, childOptions, logger);
             setAttributes(child, childAttrs);
 
-            try {
+            try { //从childGroup中选择一个EventLoop来绑定channel
                 childGroup.register(child).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {

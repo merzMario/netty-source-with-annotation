@@ -76,7 +76,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private final Queue<Runnable> taskQueue;
 
-    private volatile Thread thread;
+    private volatile Thread thread; 
     @SuppressWarnings("unused")
     private volatile ThreadProperties threadProperties;
     private final Executor executor;
@@ -825,9 +825,9 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private void execute(Runnable task, boolean immediate) {
         boolean inEventLoop = inEventLoop();
-        addTask(task);
+        addTask(task); //将任务添加到队列中
         if (!inEventLoop) {
-            startThread();
+            startThread();  //创建线程
             if (isShutdown()) {
                 boolean reject = false;
                 try {

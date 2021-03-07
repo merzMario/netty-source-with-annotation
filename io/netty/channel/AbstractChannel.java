@@ -72,7 +72,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         this.parent = parent;
         id = newId();
         unsafe = newUnsafe();
-        pipeline = newChannelPipeline();
+        pipeline = newChannelPipeline(); //创建pipeline
     }
 
     /**
@@ -463,11 +463,11 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
 
             AbstractChannel.this.eventLoop = eventLoop;
-
+            //判断当前线程是否是eventLoop中的线程
             if (eventLoop.inEventLoop()) {
                 register0(promise);
             } else {
-                try {
+                try { //创建并启动新的线程执行register任务
                     eventLoop.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -493,27 +493,27 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                     return;
                 }
                 boolean firstRegistration = neverRegistered;
-                doRegister();
+                doRegister(); //将socketChannel注册到eventLoop中的selector,当前注册的感兴趣的事件为0,不注册任何感兴趣事件
                 neverRegistered = false;
                 registered = true;
 
                 // Ensure we call handlerAdded(...) before we actually notify the promise. This is needed as the
                 // user may already fire events through the pipeline in the ChannelFutureListener.
-                pipeline.invokeHandlerAddedIfNeeded();
+                pipeline.invokeHandlerAddedIfNeeded();//触发添加handler
 
                 safeSetSuccess(promise);
-                pipeline.fireChannelRegistered();
+                pipeline.fireChannelRegistered();//触发pipeline上的channelRegistered方法
                 // Only fire a channelActive if the channel has never been registered. This prevents firing
                 // multiple channel actives if the channel is deregistered and re-registered.
                 if (isActive()) {
                     if (firstRegistration) {
-                        pipeline.fireChannelActive();
+                        pipeline.fireChannelActive();  //触发pipeline上的channelActive
                     } else if (config().isAutoRead()) {
                         // This channel was registered before and autoRead() is set. This means we need to begin read
                         // again so that we process inbound data.
                         //
                         // See https://github.com/netty/netty/issues/4805
-                        beginRead();
+                        beginRead();  //开始读消息
                     }
                 }
             } catch (Throwable t) {
@@ -544,7 +544,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                         "is not bound to a wildcard address; binding to a non-wildcard " +
                         "address (" + localAddress + ") anyway as requested.");
             }
-
+            //false
             boolean wasActive = isActive();
             try {
                 doBind(localAddress);

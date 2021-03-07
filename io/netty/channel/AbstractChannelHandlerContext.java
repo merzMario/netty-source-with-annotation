@@ -484,7 +484,7 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
             // cancelled
             return promise;
         }
-
+        //HeadContext
         final AbstractChannelHandlerContext next = findContextOutbound(MASK_BIND);
         EventExecutor executor = next.executor();
         if (executor.inEventLoop()) {
@@ -502,7 +502,7 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
 
     private void invokeBind(SocketAddress localAddress, ChannelPromise promise) {
         if (invokeHandler()) {
-            try {
+            try {  //DefaultChannelPipeline#bind
                 ((ChannelOutboundHandler) handler()).bind(this, localAddress, promise);
             } catch (Throwable t) {
                 notifyOutboundHandlerException(t, promise);

@@ -51,7 +51,7 @@ public final class ThreadExecutorMap {
     public static Executor apply(final Executor executor, final EventExecutor eventExecutor) {
         ObjectUtil.checkNotNull(executor, "executor");
         ObjectUtil.checkNotNull(eventExecutor, "eventExecutor");
-        return new Executor() {
+        return new Executor() { //executor执行execute方法时，会使用apply方法传入的executor，也就是ThreadPerTaskExecutor来执行execute方法
             @Override
             public void execute(final Runnable command) {
                 executor.execute(apply(command, eventExecutor));

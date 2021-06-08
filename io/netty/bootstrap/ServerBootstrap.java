@@ -134,8 +134,8 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         //在AbstractBootstrap#initAndRegister方法中,创建NioServerSocketChannel时创建pipeline
         ChannelPipeline p = channel.pipeline();
 
-        final EventLoopGroup currentChildGroup = childGroup;
-        final ChannelHandler currentChildHandler = childHandler; //#childHandler传入的匿名ChannelInitializer
+        final EventLoopGroup currentChildGroup = childGroup;  //启动类中调用的.group()方法传入的workerGroup，第82行
+        final ChannelHandler currentChildHandler = childHandler; //.childHandler()传入的匿名ChannelInitializer(new ChannelInitializer)
         final Entry<ChannelOption<?>, Object>[] currentChildOptions;
         synchronized (childOptions) {
             currentChildOptions = childOptions.entrySet().toArray(EMPTY_OPTION_ARRAY);
@@ -151,7 +151,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                     pipeline.addLast(handler);
                 }
 
-                ch.eventLoop().execute(new Runnable() {
+                ch.eventLoop().execute(new Runnable() {  //!!!SingleThreadEventExecutor.execute
                     @Override
                     public void run() { //将ServerBootstrapAcceptor添加到pipeline,当有连接时，会触发其channelRead方法
                         pipeline.addLast(new ServerBootstrapAcceptor( //currentChildHandler是ChannelInitializer,通过它来添加其他业务handler

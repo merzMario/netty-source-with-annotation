@@ -76,7 +76,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private final Queue<Runnable> taskQueue;
 
-    private volatile Thread thread; 
+    private volatile Thread thread;
     @SuppressWarnings("unused")
     private volatile ThreadProperties threadProperties;
     private final Executor executor;
@@ -167,7 +167,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         super(parent);
         this.addTaskWakesUp = addTaskWakesUp;
         this.maxPendingTasks = DEFAULT_MAX_PENDING_EXECUTOR_TASKS;
-        this.executor = ThreadExecutorMap.apply(executor, this);
+        this.executor = ThreadExecutorMap.apply(executor, this);  //executor是ThreadPerTaskExecutor实例，从创建NioEventLoopGroup的构造器创建
         this.taskQueue = ObjectUtil.checkNotNull(taskQueue, "taskQueue");
         this.rejectedExecutionHandler = ObjectUtil.checkNotNull(rejectedHandler, "rejectedHandler");
     }
@@ -975,7 +975,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private void doStartThread() {
         assert thread == null;
-        executor.execute(new Runnable() {
+        executor.execute(new Runnable() {  //executor 是ThreadExecutorMap.apply方法获取到的Executor，调用ThreadPerTaskExecutor执行包装的Runnable线程
             @Override
             public void run() {
                 thread = Thread.currentThread();

@@ -243,7 +243,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
      * Create a new {@link Channel} and bind it.
      */
     public ChannelFuture bind(int inetPort) {
-        return bind(new InetSocketAddress(inetPort));
+        return bind(new InetSocketAddress(inetPort));  //源码注释链路跟踪step2
     }
 
     /**
@@ -265,11 +265,11 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
      */
     public ChannelFuture bind(SocketAddress localAddress) {
         validate();
-        return doBind(ObjectUtil.checkNotNull(localAddress, "localAddress"));
+        return doBind(ObjectUtil.checkNotNull(localAddress, "localAddress")); //源码注释链路跟踪step3
     }
 
     private ChannelFuture doBind(final SocketAddress localAddress) {
-        final ChannelFuture regFuture = initAndRegister();
+        final ChannelFuture regFuture = initAndRegister();   //源码注释链路跟踪step4
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
             return regFuture;
@@ -308,7 +308,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         Channel channel = null;
         try {
             channel = channelFactory.newChannel(); //通过ReflectiveChannelFactory构造器创建NioServerSocketChannel
-            init(channel);
+            init(channel);  //源码注释链路跟踪step5
         } catch (Throwable t) {
             if (channel != null) {
                 // channel can be null if newChannel crashed (eg SocketException("too many open files"))

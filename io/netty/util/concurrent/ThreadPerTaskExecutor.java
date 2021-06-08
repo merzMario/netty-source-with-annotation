@@ -28,7 +28,7 @@ public final class ThreadPerTaskExecutor implements Executor {
     }
 
     @Override
-    public void execute(Runnable command) {
+    public void execute(Runnable command) {  //源码注释链路跟踪step10
         threadFactory.newThread(command).start(); //SingleThreadEventExecutor.doStartThread()方法中978行调用的executor.execute
     } //command即为包装的runnable线程，执行了SingleThreadEventExecutor.this.run();方法，这个run方法的实现，是在NioEventLoop.run()
 }       //这个run方法，实际就是一个无限循环，用来监听客户端的连接事件等，到这里，整个netty的mainReactor监听完成

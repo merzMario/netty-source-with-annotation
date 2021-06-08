@@ -815,7 +815,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     @Override
     public void execute(Runnable task) {
         ObjectUtil.checkNotNull(task, "task");
-        execute(task, !(task instanceof LazyRunnable) && wakesUpForTask(task));
+        execute(task, !(task instanceof LazyRunnable) && wakesUpForTask(task));  //源码注释链路跟踪step7
     }
 
     @Override
@@ -827,7 +827,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         boolean inEventLoop = inEventLoop();
         addTask(task); //将任务添加到队列中
         if (!inEventLoop) {
-            startThread();  //创建线程
+            startThread();  //创建线程   源码注释链路跟踪step8
             if (isShutdown()) {
                 boolean reject = false;
                 try {
@@ -944,7 +944,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
                 boolean success = false;
                 try {
-                    doStartThread();
+                    doStartThread();   //源码注释链路跟踪step9
                     success = true;
                 } finally {
                     if (!success) {
@@ -986,7 +986,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                 boolean success = false;
                 updateLastExecutionTime();
                 try {
-                    SingleThreadEventExecutor.this.run();
+                    SingleThreadEventExecutor.this.run();   //源码注释链路跟踪step11   此处run实现方法在NioEventLoop中
                     success = true;
                 } catch (Throwable t) {
                     logger.warn("Unexpected exception from an event executor: ", t);

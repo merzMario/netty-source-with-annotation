@@ -432,7 +432,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     }
 
     @Override
-    protected void run() {
+    protected void run() { //源码注释链路跟踪step12
         int selectCnt = 0;
         for (;;) {
             try {

@@ -150,14 +150,14 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 if (handler != null) {
                     pipeline.addLast(handler);
                 }
-
-                ch.eventLoop().execute(new Runnable() {  //!!!SingleThreadEventExecutor.execute
+                //划重点！！！！！ execute方法
+                ch.eventLoop().execute(new Runnable() {  //!!!SingleThreadEventExecutor.execute   源码注释链路跟踪step6
                     @Override
                     public void run() { //将ServerBootstrapAcceptor添加到pipeline,当有连接时，会触发其channelRead方法
                         pipeline.addLast(new ServerBootstrapAcceptor( //currentChildHandler是ChannelInitializer,通过它来添加其他业务handler
                                 ch, currentChildGroup, currentChildHandler, currentChildOptions, currentChildAttrs));
                     }           //ServerBootstrapAcceptor 是一个ChannelInboundHandler
-                });
+                });         //添加了ServerBootstrapAcceptor的作用就是在有连接接入时，使用channelInitializer来向pipeline中添加handler
             }
         });
     }
@@ -209,7 +209,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
             final Channel child = (Channel) msg;
             //当有连接时，会触发channelRead方法，将业务handler添加到pipeline中
-            child.pipeline().addLast(childHandler);
+            child.pipeline().addLast(childHandler); //连接的msg 是一个channel,channel中包含的pipeline,将channelIntializer添加进来
 
             setChannelOptions(child, childOptions, logger);
             setAttributes(child, childAttrs);

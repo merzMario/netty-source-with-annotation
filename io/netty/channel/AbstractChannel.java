@@ -461,7 +461,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                         new IllegalStateException("incompatible event loop type: " + eventLoop.getClass().getName()));
                 return;
             }
-
+            //将eventLoop绑定到channel
             AbstractChannel.this.eventLoop = eventLoop;
             //判断当前线程是否是eventLoop中的线程
             if (eventLoop.inEventLoop()) {
@@ -470,8 +470,8 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 try { //创建并启动新的线程执行register任务
                     eventLoop.execute(new Runnable() {
                         @Override
-                        public void run() {
-                            register0(promise);
+                        public void run() { //将register0包装成任务
+                            register0(promise);  //此方法会触发pipeline上的registered/active/read等方法的执行
                         }
                     });
                 } catch (Throwable t) {
@@ -547,7 +547,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             //false
             boolean wasActive = isActive();
             try {
-                doBind(localAddress);
+                doBind(localAddress);  //NIO底层的bind,实现类为NioServerSocketChannel
             } catch (Throwable t) {
                 safeSetFailure(promise, t);
                 closeIfClosed();

@@ -825,7 +825,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private void execute(Runnable task, boolean immediate) {
         boolean inEventLoop = inEventLoop();
-        addTask(task); //将任务添加到队列中
+        addTask(task); //将任务添加到队列中，当前跟踪的任务是register0
         if (!inEventLoop) {
             startThread();  //创建线程   源码注释链路跟踪step8
             if (isShutdown()) {
@@ -975,7 +975,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private void doStartThread() {
         assert thread == null;
-        executor.execute(new Runnable() {  //executor 是ThreadExecutorMap.apply方法获取到的Executor，调用ThreadPerTaskExecutor执行包装的Runnable线程
+        executor.execute(new Runnable() {  //executor 是ThreadExecutorMap.apply方法获取到的Executor，调用ThreadPerTaskExecutor执行包装的Runnable任务
             @Override
             public void run() {
                 thread = Thread.currentThread();
@@ -987,7 +987,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                 updateLastExecutionTime();
                 try {
                     SingleThreadEventExecutor.this.run();   //源码注释链路跟踪step11   此处run实现方法在NioEventLoop中
-                    success = true;
+                    success = true;  //run方法启动了acceptor线程对连接事件的轮询，netty一切魔法的开始
                 } catch (Throwable t) {
                     logger.warn("Unexpected exception from an event executor: ", t);
                 } finally {

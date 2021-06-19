@@ -383,7 +383,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
                 if (!selected) {
                     // Force the Selector to select now as the "canceled" SelectionKey may still be
                     // cached and not removed because no Select.select(..) operation was called yet.
-                    eventLoop().selectNow();
+                    eventLoop().selectNow();  //非阻塞查询
                     selected = true;
                 } else {
                     // We forced a select operation on the selector before but the SelectionKey is still cached

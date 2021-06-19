@@ -160,15 +160,15 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
 
                     allocHandle.incMessagesRead(1);
                     readPending = false;
-                    pipeline.fireChannelRead(byteBuf);
+                    pipeline.fireChannelRead(byteBuf);  //触发pipeline上的read方法
                     byteBuf = null;
                 } while (allocHandle.continueReading());
 
                 allocHandle.readComplete();
-                pipeline.fireChannelReadComplete();
+                pipeline.fireChannelReadComplete();   //触发readComplete方法
 
                 if (close) {
-                    closeOnRead(pipeline);
+                    closeOnRead(pipeline);  //如果有自定义事件，触发自定义事件，最后触发close
                 }
             } catch (Throwable t) {
                 handleReadException(pipeline, byteBuf, t, close, allocHandle);

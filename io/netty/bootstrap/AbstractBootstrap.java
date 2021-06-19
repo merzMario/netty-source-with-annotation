@@ -295,7 +295,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
                         // Registration was successful, so set the correct executor to use.
                         // See https://github.com/netty/netty/issues/2586
                         promise.registered();
-
+                        //触发pipeline中的outboundHandler,执行的是HeadContext中的bind,最终执行的是NIO中的channel.bind()方法
                         doBind0(regFuture, channel, localAddress, promise);
                     }
                 }
